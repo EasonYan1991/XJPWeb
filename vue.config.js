@@ -2,6 +2,12 @@
 const path = require('path')
 const defaultSettings = require('./src/settings.js')
 
+const webpack = require('webpack')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
+
+const cesiumSource = './node_modules/cesium/Source'
+const cesiumWorkers = '../Build/Cesium/Workers'
+
 function resolve(dir) {
   return path.join(__dirname, dir)
 }
@@ -21,7 +27,7 @@ module.exports = {
    * In most cases please use '/' !!!
    * Detail: https://cli.vuejs.org/config/#publicpath
    */
-  publicPath: '/',
+  publicPath: './',
   outputDir: 'dist',
   assetsDir: 'static',
   lintOnSave: process.env.NODE_ENV === 'development',
@@ -52,8 +58,35 @@ module.exports = {
     name: name,
     resolve: {
       alias: {
-        '@': resolve('src')
+        '@': resolve('src'),
+        'cesium': path.resolve(__dirname, cesiumSource)
       }
+    },
+    plugins: [
+      new CopyWebpackPlugin([{
+        from: path.join(cesiumSource, cesiumWorkers),
+        to: 'Workers'
+      }]),
+      new CopyWebpackPlugin([{
+        from: path.join(cesiumSource, 'Assets'),
+        to: 'Assets'
+      }]),
+      new CopyWebpackPlugin([{
+        from: path.join(cesiumSource, 'Widgets'),
+        to: 'Widgets'
+      }]),
+      new CopyWebpackPlugin([{
+        from: path.join(cesiumSource, 'ThirdParty/Workers'),
+        to: 'ThirdParty/Workers'
+      }]),
+      new webpack.DefinePlugin({
+        CESIUM_BASE_URL: JSON.stringify('./')
+      })
+    ],
+    module: {
+      // unknownContextCritical: /^.\/.*$/
+      unknownContextCritical: false
+
     }
   },
   chainWebpack(config) {
@@ -89,7 +122,7 @@ module.exports = {
       .end()
 
     config
-    // https://webpack.js.org/configuration/devtool/#development
+      // https://webpack.js.org/configuration/devtool/#development
       .when(process.env.NODE_ENV === 'development',
         config => config.devtool('cheap-source-map')
       )
@@ -101,7 +134,7 @@ module.exports = {
             .plugin('ScriptExtHtmlWebpackPlugin')
             .after('html')
             .use('script-ext-html-webpack-plugin', [{
-            // `runtime` must same as runtimeChunk name. default is `runtime`
+              // `runtime` must same as runtimeChunk name. default is `runtime`
               inline: /runtime\..*\.js$/
             }])
             .end()

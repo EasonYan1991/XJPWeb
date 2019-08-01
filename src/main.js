@@ -27,12 +27,14 @@ Vue.use(VueWindow)
  * Currently MockJs will be used in the production environment,
  * please remove it before going online! ! !
  */
-import {
-  mockXHR
-} from '../mock'
+import { mockXHR } from '../mock'
 if (process.env.NODE_ENV === 'production') {
   mockXHR()
 }
+
+import preview from 'vue-photo-preview'
+import 'vue-photo-preview/dist/skin.css'
+Vue.use(preview)
 
 // set ElementUI lang to EN
 Vue.use(ElementUI, {

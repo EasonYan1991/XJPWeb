@@ -8,21 +8,42 @@
         width="100%"
         height="100%"
         class="img"
-        src="@/assets/login_pictures/武汉.jpg"
+        src="@/assets/login_pictures/8.jpg"
         alt=""
       ></div>
       <div class="bg"><img
         width="100%"
         height="100%"
         class="img"
-        src="@/assets/login_pictures/city.jpg"
+        src="@/assets/login_pictures/2.png"
+        alt=""
+      ></div>
+      <!-- <div class="bg"><img
+        width="100%"
+        height="100%"
+        class="img"
+        src="@/assets/login_pictures/4.png"
+        alt=""
+      ></div> -->
+      <div class="bg"><img
+        width="100%"
+        height="100%"
+        class="img"
+        src="@/assets/login_pictures/5.png"
         alt=""
       ></div>
       <div class="bg"><img
         width="100%"
         height="100%"
         class="img"
-        src="@/assets/login_pictures/city2.jpg"
+        src="@/assets/login_pictures/6.png"
+        alt=""
+      ></div>
+      <div class="bg"><img
+        width="100%"
+        height="100%"
+        class="img"
+        src="@/assets/login_pictures/7.png"
         alt=""
       ></div>
     </div>
@@ -33,7 +54,7 @@
           label-position="left"
           :model="loginForm"
         >
-          <h3 class="title">管理平台</h3>
+          <h3 class="title">平台登录</h3>
           <el-form-item prop="username">
             <el-input
               v-model="loginForm.username"
@@ -207,11 +228,11 @@ export default {
 
 .bg {
   /* height: 100%; */
-  -webkit-filter: blur(5px);
+  /* -webkit-filter: blur(5px);
   -moz-filter: blur(5px);
   -ms-filter: blur(5px);
   filter: blur(5px);
-  filter: progid:DXImageTransform.Microsoft.Blur(PixelRadius=10, MakeShadow=false);
+  filter: progid:DXImageTransform.Microsoft.Blur(PixelRadius=10, MakeShadow=false); */
 }
 
 #login {
@@ -220,7 +241,7 @@ export default {
   min-width: 250px;
   position: absolute;
   /* margin: 200px auto; */
-  left: 50%;
+  left: 80%;
   top: 40%;
   transform: translate(-50%, -50%);
   background-color: whitesmoke;

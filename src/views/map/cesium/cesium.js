@@ -55,7 +55,7 @@ function initBaseLayer(viewer) {
     iconUrl: 'https://cesiumjs.org/releases/1.56.1/Build/Cesium/Widgets/Images/ImageryProviders/esriWorldStreetMap.png',
     creationFunction: function() {
       var esri = new Cesium.ArcGisMapServerImageryProvider({
-        url: 'http://services.arcgisonline.com/arcgis/rest/services/World_Physical_Map/MapServer'
+        url: 'http://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer'
       })
       return esri
     }
@@ -260,6 +260,41 @@ function getPositionByMouse(cesiumObjs) {
     height = Math.ceil(cesiumObjs.viewer.camera.positionCartographic.height)
     cesiumObjs.wHeight = height.toFixed(0)
   }, Cesium.ScreenSpaceEventType.WHEEL)
+}
+
+// tooltip
+export function initTooltip(viewer, tooltipParams) {
+  var handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas)
+  handler.setInputAction(event => {
+    var pickedPrimitive = viewer.scene.pick(event.endPosition)
+    var pickedEntity = Cesium.defined(pickedPrimitive)
+      ? pickedPrimitive.id
+      : undefined
+    if (Cesium.defined(pickedEntity)) {
+      if (pickedEntity.properties.propertyNames.indexOf('name_1') > -1) {
+        tooltipParams.title = pickedEntity.properties.name_1._value
+        tooltipParams.layerType = '社区'
+      } else if (pickedEntity.properties.propertyNames.indexOf('楼栋号') > -1) {
+        tooltipParams.title = pickedEntity.properties['楼栋号']._value
+        tooltipParams.layerType = '楼栋'
+      } else if (
+        pickedEntity.properties.propertyNames.indexOf('grid_name') > -1
+      ) {
+        tooltipParams.title = pickedEntity.properties.grid_name._value
+        tooltipParams.layerType = '网格'
+      } else {
+        tooltipParams.title = pickedEntity.properties.name._value
+        tooltipParams.layerType = '楼栋'
+      }
+      tooltipParams.opened = true
+      tooltipParams.left = event.endPosition.x
+      tooltipParams.top = event.endPosition.y
+    } else {
+      tooltipParams.opened = false
+      tooltipParams.left = 0
+      tooltipParams.top = 0
+    }
+  }, Cesium.ScreenSpaceEventType.MOUSE_MOVE)
 }
 
 // 缩放到jsonLayer

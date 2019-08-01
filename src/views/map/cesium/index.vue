@@ -4,6 +4,14 @@
       id="cesiumContainer"
       ref="cesiumContainer"
     />
+    <Cesium-tooltip
+      :title="tooltipParams.title"
+      :opened="tooltipParams.opened"
+      :layer-type="tooltipParams.layerType"
+      :left="tooltipParams.left"
+      :top="tooltipParams.top"
+    />
+
     <!-- <LayerTree /> -->
     <div id="menu">
       <el-card class="box-card">
@@ -28,7 +36,7 @@
               <span>{{ node.label }}</span>
             </span>
           </span>
-        </el-tree> -->
+        </el-tree>-->
         <el-tree
           class="tree"
           :data="tree_data"
@@ -45,7 +53,7 @@
       <!-- <cesium-window
         :title="windowParams.title"
         :opened="windowParams.opened"
-      /> -->
+      />-->
       <cesium-dialog
         :title="windowParams.title"
         :opened="windowParams.opened"
@@ -93,7 +101,7 @@
           inactive-color="#ff4949"
         >1
         </el-switch>
-      </div> -->
+      </div>-->
     </el-dialog>
   </div>
 </template>
@@ -104,8 +112,15 @@ import 'cesium/Widgets/widgets.css'
 import CesiumNavigation from 'cesium-navigation-es6'
 // import CesiumWindow from './components/CesiumWindow'
 import CesiumDialog from './components/CesiumDialog'
+import CesiumTooltip from './components/CesiumTooltip'
 // import LayerTree from './components/LayerTree'
-import { initCesium, initInfoBox, loadJsonLayer, FlyToJsonLayer } from './cesium.js'
+import {
+  initCesium,
+  initInfoBox,
+  initTooltip,
+  loadJsonLayer,
+  FlyToJsonLayer
+} from './cesium.js'
 
 import communityJson from '@/assets/geojson/社区.json'
 import saxc_Building_Json from '@/assets/geojson/json_水岸星城/建筑_水岸星城.json'
@@ -117,7 +132,8 @@ export default {
   name: '',
   components: {
     // CesiumWindow,
-    CesiumDialog
+    CesiumDialog,
+    CesiumTooltip
     // LayerTree
   },
   data() {
@@ -133,6 +149,13 @@ export default {
         title: '',
         opened: false,
         layerType: ''
+      },
+      tooltipParams: {
+        title: '',
+        opened: false,
+        layerType: '',
+        left: 0,
+        top: 0
       },
       tree_data: [
         {
@@ -174,30 +197,56 @@ export default {
     init() {
       initCesium(this.cesiumObjs, CesiumNavigation)
       initInfoBox(this.cesiumObjs.viewer, this.windowParams)
+      initTooltip(this.cesiumObjs.viewer, this.tooltipParams)
     },
     loadJson() {
-      var communityLayer = loadJsonLayer(this.cesiumObjs.viewer, communityJson, '社区', (entity) => {
-        entity.name = entity.properties.name_1
-        this.setEntityLabel(entity, 9000)
-      })
-      var SaxcGridLayer = loadJsonLayer(this.cesiumObjs.viewer, saxc_grid_Json, '网格_水岸星城', (entity) => {
-        entity.name = entity.properties.grid_name
-        this.setEntityLabel(entity, 5000)
-      })
-      var HubuGridLayer = loadJsonLayer(this.cesiumObjs.viewer, hubu_grid_Json, '网格_湖北大学', (entity) => {
-        entity.name = entity.properties.grid_name
-        this.setEntityLabel(entity, 5000)
-      })
-      var SaxcBuilingLayer = loadJsonLayer(this.cesiumObjs.viewer, saxc_Building_Json, '建筑_水岸星城', (entity) => {
-        entity.name = entity.properties['楼栋号']
-        this.setEntityLabel(entity, 1500)
-      })
-      var HubuBuilingLayer = loadJsonLayer(this.cesiumObjs.viewer, hubu_Building_Json, '建筑_湖北大学', (entity) => {
-        entity.name = entity.properties.name
-        this.setEntityLabel(entity, 1500)
-      })
-      FlyToJsonLayer(communityLayer, this.cesiumObjs.viewer)
+      var communityLayer = loadJsonLayer(
+        this.cesiumObjs.viewer,
+        communityJson,
+        '社区',
+        entity => {
+          entity.name = entity.properties.name_1
+          this.setEntityLabel(entity, 9000)
+        }
+      )
+      var SaxcGridLayer = loadJsonLayer(
+        this.cesiumObjs.viewer,
+        saxc_grid_Json,
+        '网格_水岸星城',
+        entity => {
+          entity.name = entity.properties.grid_name
+          this.setEntityLabel(entity, 5000)
+        }
+      )
+      var HubuGridLayer = loadJsonLayer(
+        this.cesiumObjs.viewer,
+        hubu_grid_Json,
+        '网格_湖北大学',
+        entity => {
+          entity.name = entity.properties.grid_name
+          this.setEntityLabel(entity, 5000)
+        }
+      )
+      var SaxcBuilingLayer = loadJsonLayer(
+        this.cesiumObjs.viewer,
+        saxc_Building_Json,
+        '建筑_水岸星城',
+        entity => {
+          entity.name = entity.properties['楼栋号']
+          this.setEntityLabel(entity, 1500)
+        }
+      )
+      var HubuBuilingLayer = loadJsonLayer(
+        this.cesiumObjs.viewer,
+        hubu_Building_Json,
+        '建筑_湖北大学',
+        entity => {
+          entity.name = entity.properties.name
+          this.setEntityLabel(entity, 1500)
+        }
+      )
 
+      FlyToJsonLayer(communityLayer, this.cesiumObjs.viewer)
       this.jsonLayers.set('社区', communityLayer)
       this.jsonLayers.set('网格_水岸星城', SaxcGridLayer)
       this.jsonLayers.set('网格_湖北大学', HubuGridLayer)
@@ -211,7 +260,10 @@ export default {
         scale: 0.6,
         horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
         verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-        distanceDisplayCondition: new Cesium.DistanceDisplayCondition(10.0, distance),
+        distanceDisplayCondition: new Cesium.DistanceDisplayCondition(
+          10.0,
+          distance
+        ),
         disableDepthTestDistance: 100.0
       }
     },
@@ -243,7 +295,8 @@ export default {
       var target = this.jsonLayers.get(data.label)
       target.then(function(dataSource) {
         console.log(dataSource)
-        var alpha = dataSource.entities.values[0].polygon.material.color._value.alpha
+        var alpha =
+          dataSource.entities.values[0].polygon.material.color._value.alpha
         self.transparency = alpha
         // debugger
         self.SelectedDataSource = dataSource
@@ -258,7 +311,15 @@ export default {
             <span>{node.label}</span>
           </span>
           <span>
-            <el-button size='mini' type='text' on-click={event => { this.openTPanel(node, data, event) }}>设置</el-button>
+            <el-button
+              size='mini'
+              type='text'
+              on-click={event => {
+                this.openTPanel(node, data, event)
+              }}
+            >
+              设置
+            </el-button>
           </span>
         </span>
       )

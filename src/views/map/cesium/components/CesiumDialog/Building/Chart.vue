@@ -34,10 +34,13 @@ export default {
         female: 0
       },
       age: {
-        minor: 0,
-        youth: 0,
-        middle: 0,
-        old: 0
+        twelve: 0,
+        forty_five: 0,
+        sixty: 0,
+        sixty_five: 0,
+        eighty: 0,
+        ninety: 0,
+        hundred: 0
       }
     }
   },
@@ -55,17 +58,26 @@ export default {
 
         var age = this.caculateAge1(l.IDCard)
         switch (true) {
-          case age < 18:
-            this.age.minor++
+          case age < 12:
+            this.age.twelve++
             break
-          case age < 40:
-            this.age.youth++
+          case age < 45:
+            this.age.forty_five++
+            break
+          case age < 60:
+            this.age.sixty++
             break
           case age < 65:
-            this.age.middle++
+            this.age.sixty_five++
+            break
+          case age < 80:
+            this.age.eighty++
+            break
+          case age < 90:
+            this.age.ninety++
             break
           default:
-            this.age.old++
+            this.age.hundred++
             break
         }
       })
@@ -156,13 +168,14 @@ export default {
         backgroundColor: '#2c343c',
         xAxis: {
           type: 'category',
-          data: ['0-18', '18-40', '40-65', '65-']
+          data: ['0-12', '12-45', '45-60', '60-65', '65-80', '80-90', '90-']
         },
         yAxis: {
           type: 'value'
         },
         series: [{
-          data: [this.age.minor, this.age.youth, this.age.middle, this.age.old],
+          data: Object.keys(this.age).map(key => this.age[key]),
+          // data: [this.age.twelve, this.age.forty_five, this.age.sixty, this.age.sixty_five, this.age.eighty, this.age.ninety, this.age.ninety],
           type: 'bar'
         }]
       })

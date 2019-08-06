@@ -55,7 +55,7 @@ export default {
       title: '紧急事件',
       dialogVisible: false,
       tableData: [{
-        type: '火灾',
+        type: '火灾1',
         location: '水岸星城G18-1-2302',
         time: '2019-5-31-13:11'
       }],
